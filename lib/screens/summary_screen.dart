@@ -63,7 +63,7 @@ class SummaryScreen extends StatelessWidget {
                   ),
                 ),
                 child: const Text(
-                  'Retake Quiz!',
+                  'Return to Setup Screen!',
                   style: TextStyle(fontSize: 25),
                 ),
               ),

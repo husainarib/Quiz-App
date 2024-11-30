@@ -21,6 +21,7 @@ class _QuizScreenState extends State<QuizScreen> {
   bool _isLoading = true;
   Timer? _timer;
   int _remainingTime = 10;
+  String? _feedbackMessage;
 
   @override
   void initState() {
@@ -28,7 +29,6 @@ class _QuizScreenState extends State<QuizScreen> {
     _fetchQuestions();
   }
 
-  // Fetch questions method
   Future<void> _fetchQuestions() async {
     final url =
         'https://opentdb.com/api.php?amount=${widget.settings['numQuestions']}&category=${widget.settings['category']}&difficulty=${widget.settings['difficulty']}&type=${widget.settings['type']}';
@@ -53,14 +53,13 @@ class _QuizScreenState extends State<QuizScreen> {
     }
   }
 
-  // DEBUG for no questions appearing
   void _showNoQuestionsDialog() {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('No Questions Found'),
         content: const Text(
-            'The selected quiz settings returned no questions. Please try a different category.'),
+            'The selected quiz settings returned no questions. Please try different settings.'),
         actions: [
           TextButton(
             onPressed: () {
@@ -74,7 +73,6 @@ class _QuizScreenState extends State<QuizScreen> {
     );
   }
 
-  // Timer method
   void _startTimer() {
     _remainingTime = 10;
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
@@ -82,18 +80,21 @@ class _QuizScreenState extends State<QuizScreen> {
         if (_remainingTime > 0) {
           _remainingTime--;
         } else {
+          // Time's up logic
           timer.cancel();
-          _nextQuestion();
+          _feedbackMessage =
+              "Time's up! The correct answer is: ${_questions[_currentQuestionIndex].correctAnswer}";
+          Future.delayed(const Duration(seconds: 2), _nextQuestion);
         }
       });
     });
   }
 
-  // Next question method
   void _nextQuestion() {
     if (_currentQuestionIndex + 1 < _questions.length) {
       setState(() {
         _currentQuestionIndex++;
+        _feedbackMessage = null;
         _remainingTime = 10;
       });
       _startTimer();
@@ -103,7 +104,6 @@ class _QuizScreenState extends State<QuizScreen> {
     }
   }
 
-  // Show summary method
   void _showSummary() {
     Navigator.pushReplacement(
       context,
@@ -146,37 +146,55 @@ class _QuizScreenState extends State<QuizScreen> {
             Text('Question ${_currentQuestionIndex + 1}/${_questions.length}'),
       ),
       body: Container(
-        color: Colors.lightBlue[50],
-        padding: const EdgeInsets.all(16.0),
+        color: Colors.lightBlue[50], 
+        padding: const EdgeInsets.all(16),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
+            // Real-time Score Display
             Text(
-              question.questionText,
-              textAlign: TextAlign.center,
+              'Score: $_score',
               style: const TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
                 color: Colors.blueAccent,
               ),
+              textAlign: TextAlign.center,
             ),
-            const SizedBox(height: 32),
+            const SizedBox(height: 16),
+
+            // Question Text
+            Text(
+              question.questionText,
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: Colors.black,
+              ),
+            ),
+            const SizedBox(height: 24),
+
+            // Answer Options
             ...question.shuffledAnswers.map((option) {
               return Column(
                 children: [
                   ElevatedButton(
                     onPressed: () {
-                      if (option == question.correctAnswer) {
-                        _score++;
-                      }
-                      _nextQuestion();
+                      setState(() {
+                        if (option == question.correctAnswer) {
+                          _score++;
+                          _feedbackMessage = 'Correct!';
+                        } else {
+                          _feedbackMessage =
+                              'Incorrect! The correct answer is: ${question.correctAnswer}';
+                        }
+                      });
+                      Future.delayed(const Duration(seconds: 2), _nextQuestion);
                     },
                     style: ElevatedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(
-                        vertical: 20,
-                      ),
-                      backgroundColor: Colors.blue,
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      backgroundColor: Colors.blueAccent,
                       foregroundColor: Colors.white,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
@@ -184,23 +202,36 @@ class _QuizScreenState extends State<QuizScreen> {
                     ),
                     child: Text(
                       option,
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
+                      style: const TextStyle(fontSize: 16),
                     ),
                   ),
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 16), 
                 ],
               );
             }).toList(),
-            // Timer text
+
+            // Feedback Message
+            if (_feedbackMessage != null)
+              Text(
+                _feedbackMessage!,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: _feedbackMessage == 'Correct!'
+                      ? Colors.green
+                      : Colors.red,
+                ),
+              ),
+
+            const Spacer(),
+
+            // Timer Display
             Text(
               'Time Remaining: $_remainingTime seconds',
               textAlign: TextAlign.center,
               style: const TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
+                fontSize: 16,
                 color: Colors.red,
               ),
             ),

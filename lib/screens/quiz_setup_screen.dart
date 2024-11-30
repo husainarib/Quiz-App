@@ -13,8 +13,8 @@ class QuizSetupScreen extends StatefulWidget {
 
 class _QuizSetupScreenState extends State<QuizSetupScreen> {
   final List<int> _numQuestionsOptions = [5, 10, 15];
-  final List<String> _difficultyOptions = ['easy', 'medium', 'hard'];
-  final List<String> _typeOptions = ['multiple', 'boolean'];
+  final List<String> _difficultyOptions = ['Easy', 'Medium', 'Hard'];
+  final List<String> _typeOptions = ['Multiple', 'True/False'];
 
   int _selectedNumQuestions = 5;
   String _selectedDifficulty = 'easy';
@@ -73,7 +73,7 @@ class _QuizSetupScreenState extends State<QuizSetupScreen> {
             // Title
             const Center(
               child: Text(
-                'Customize Your Quiz',
+                'Customize Your Quiz!',
                 style: TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
