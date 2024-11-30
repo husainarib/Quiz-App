@@ -41,7 +41,6 @@ class _QuizSetupScreenState extends State<QuizSetupScreen> {
     }
   }
 
-  // DEBUG fetched categories
   void _showValidationError(String message) {
     showDialog(
       context: context,
@@ -61,13 +60,30 @@ class _QuizSetupScreenState extends State<QuizSetupScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Quiz Setup')),
-      body: Padding(
+      appBar: AppBar(
+        title: const Text('Quiz Setup'),
+        backgroundColor: Colors.blueAccent,
+      ),
+      body: Container(
+        color: Colors.lightBlue[50],
         padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // QUESTIONS
+            // Title
+            const Center(
+              child: Text(
+                'Customize Your Quiz',
+                style: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.blueAccent,
+                ),
+              ),
+            ),
+            const SizedBox(height: 20),
+
+            // Number of Questions
             DropdownButtonFormField<int>(
               value: _selectedNumQuestions,
               onChanged: (value) =>
@@ -76,11 +92,14 @@ class _QuizSetupScreenState extends State<QuizSetupScreen> {
                   .map((num) => DropdownMenuItem(
                       value: num, child: Text('$num Questions')))
                   .toList(),
-              decoration:
-                  const InputDecoration(labelText: 'Number of Questions'),
+              decoration: const InputDecoration(
+                labelText: 'Number of Questions',
+                border: OutlineInputBorder(),
+              ),
             ),
             const SizedBox(height: 16),
-            // DIFFICULTY
+
+            // Difficulty
             DropdownButtonFormField<String>(
               value: _selectedDifficulty,
               onChanged: (value) =>
@@ -89,10 +108,14 @@ class _QuizSetupScreenState extends State<QuizSetupScreen> {
                   .map((difficulty) => DropdownMenuItem(
                       value: difficulty, child: Text(difficulty)))
                   .toList(),
-              decoration: const InputDecoration(labelText: 'Difficulty'),
+              decoration: const InputDecoration(
+                labelText: 'Difficulty',
+                border: OutlineInputBorder(),
+              ),
             ),
             const SizedBox(height: 16),
-            // TYPE OF QUESTION
+
+            // Type of Question
             DropdownButtonFormField<String>(
               value: _selectedType,
               onChanged: (value) => setState(() => _selectedType = value!),
@@ -100,10 +123,14 @@ class _QuizSetupScreenState extends State<QuizSetupScreen> {
                   .map((type) =>
                       DropdownMenuItem(value: type, child: Text(type)))
                   .toList(),
-              decoration: const InputDecoration(labelText: 'Type'),
+              decoration: const InputDecoration(
+                labelText: 'Question Type',
+                border: OutlineInputBorder(),
+              ),
             ),
             const SizedBox(height: 16),
-            // CATEGORY
+
+            // Category
             DropdownButtonFormField<Category>(
               value: _selectedCategory,
               onChanged: (value) {
@@ -117,17 +144,20 @@ class _QuizSetupScreenState extends State<QuizSetupScreen> {
                         child: Text(category.name),
                       ))
                   .toList(),
-              decoration: const InputDecoration(labelText: 'Category'),
+              decoration: const InputDecoration(
+                labelText: 'Category',
+                border: OutlineInputBorder(),
+              ),
             ),
             const SizedBox(height: 32),
-            // If category is not selected
+
+            // Start Quiz Button
             Center(
               child: ElevatedButton(
                 onPressed: () {
                   if (_selectedCategory == null) {
                     _showValidationError('Please select a category.');
                   } else if (_selectedCategory!.id == 0) {
-                    // Example: Invalid ID
                     _showValidationError('Invalid category selected.');
                   } else {
                     Navigator.push(
@@ -145,7 +175,18 @@ class _QuizSetupScreenState extends State<QuizSetupScreen> {
                     );
                   }
                 },
-                child: const Text('Start Quiz'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.blueAccent,
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                child: const Text(
+                  'Start Quiz',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
               ),
             ),
           ],
